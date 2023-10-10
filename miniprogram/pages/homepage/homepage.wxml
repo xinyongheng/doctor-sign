@@ -1,0 +1,50 @@
+<!-- pages/homepage/homepage.wxml -->
+<view>
+    <view class="header">
+        <view style="height:20rpx"></view>
+        <!-- 日期选择 -->
+        <picker class="" mode="date" value="{{selectDate}}" bindchange="bindDateChange" fields="day">
+            <view class="font30">
+                <text class="color3">* 选择日期：</text>
+                <text class="color6">{{selectDate}}</text>
+                <text class="timeIcon">▼</text>
+            </view>
+        </picker>
+        <!-- 排班 -->
+        <picker class="" range="{{doctorWorkStyles}}" value="{{doctorWorkIndex}}" bindchange="bindDoctorWorkChange" bindcancel="">
+            <view class="font30">
+                <text class="color3">* 排班类型：</text>
+                <text class="color6">{{doctorWorkStyles[doctorWorkIndex]}}</text>
+                <text class="timeIcon">▼</text>
+            </view>
+        </picker>
+    </view>
+    <!-- 日期列表 -->
+    <view style="margin-top:10rpx">
+        <!-- 日期 -->
+        <view class="center">
+            <text style="font-size:45rpx;font:bold">{{selectMonth}}</text>
+        </view>
+        <!-- grid列表 -->
+        <view class="gridview">
+            <view class="gridview-item" wx:for="{{week}}" wx:key="index">
+                <view class="center" style="color:{{(index>4)?'red':'black'}}">{{item}}</view>
+            </view>
+        </view>
+        <view class="gridview">
+            <view class="gridview-item" wx:for="{{workDates}}" wx:key="index" wx:for-item="workDate">
+                <!-- 日期子元素 -->
+                <view style="background-color:{{workDate.value?'#1ae':'transparent'}}">
+                    <view class="{{isToday(workDate.year,workDate.month,workDate.date)?'child-item':''}}">
+                        <view class="date-item">
+                            <view style="color:{{workDate.bgColor}}">{{workDate.value}}</view>
+                            <view style="color:white;font-size:18rpx;margin-top:5rpx">
+                                {{ workDate.explain }}
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>

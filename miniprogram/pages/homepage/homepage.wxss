@@ -1,0 +1,144 @@
+/* pages/homepage/homepage.wxss */
+.timeIcon {
+    color: #000000;
+    font-size: 20rpx;
+    margin-left: 5rpx;
+}
+
+.font30 {
+    font-size: 35rpx;
+}
+
+.color3 {
+    color: black;
+    padding-left: 10rpx;
+}
+
+.color6 {
+    color: #666;
+}
+
+.center {
+    justify-content: center;
+    align-items: center;
+    /* width: 100%; */
+    display: flex;
+}
+
+.gridview:before {
+    content: " ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 5px;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+}
+
+.gridview:after {
+    content: " ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    /* 整体的左边距 */
+    border-left: 5px solid #d9d9d9;
+    color: #d9d9d9;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleX(0.5);
+    transform: scaleX(0.5);
+}
+
+.gridview-item {
+    margin: 1% 1% 1% 1%;
+    background: transparent;
+    /* 加上下面一行表示默认的分割线 */
+    /* position: relative; */
+    float: left;
+    /* 内边距可根据实际情况添加 */
+    /* padding: 5px 5px 5px 5px; */
+    width: 12.2%;
+    border-right: 2rpx solid black;
+    border-top: 2rpx solid black;
+    border-bottom: 2rpx solid black;
+    border-left: 2rpx solid black;
+    box-sizing: border-box;
+}
+
+.gridview-item:before {
+    content: " ";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 1px;
+    bottom: 0;
+    border-right: 5px solid #d9d9d9;
+    color: #d9d9d9;
+    -webkit-transform-origin: 100% 0;
+    transform-origin: 100% 0;
+    -webkit-transform: scaleX(0.5);
+    transform: scaleX(0.5);
+}
+
+.gridview-item:after {
+    content: " ";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 1px;
+    border-bottom: 1px solid red;
+    color: red;
+    -webkit-transform-origin: 0 100%;
+    transform-origin: 0 100%;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+}
+
+.gridview-item:active {
+    background-color: #ececec;
+}
+
+.gridview-item__bg {
+    background: #fff;
+    position: relative;
+    float: left;
+    padding: 0px 0px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gridview-item__view {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #222;
+    background: #80cbc4;
+    margin: 10px;
+}
+
+.date-item {
+    height: 100rpx;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font: bold;
+    box-sizing: border-box;
+}
+
+.child-item {
+    border-radius: 300rpx;
+    border: 1rpx solid red;
+    box-sizing: border-box;
+}
