@@ -8,7 +8,9 @@ interface WorkSetting {
   index: number,
   value: number | string,
   explain: string,
-  bgColor: string
+  bgColor: string,
+  isToday?: boolean,
+  dateType?: string,
 }
 Page({
 
@@ -18,7 +20,7 @@ Page({
   data: {
     selectDate: '2023-10-09',
     selectMonth: '2023-10',
-    doctorWorkIndex: 0,
+    doctorWorkIndex: 1,
     gridHeight: 100,
     doctorWorkStyles: [
       '白班',
@@ -30,16 +32,49 @@ Page({
     week: ['一', '二', '三', '四', '五', '六', '日'],
     workDates: [
       { type: 0, year: 1, month: 1, date: 1, index: 0 },
-      { type: 0, year: 2, month: 1, date: 1, index: 0 },
-      { type: 0, year: 3, month: 1, date: 1, index: 0 },
-      { type: 0, year: 4, month: 1, date: 1, index: 0 },
-      { type: 0, year: 5, month: 1, date: 1, index: 0 },
-      { type: 0, year: 6, month: 1, date: 1, index: 0 },
-      { type: 0, year: 7, month: 1, date: 1, index: 0 },
-      { type: 0, year: 8, month: 1, date: 1, index: 0 },
-      { type: 0, year: 9, month: 1, date: 1, index: 0 },
-      { type: 0, year: 10, month: 1, date: 1, index: 0 },
     ],
+    holiday: [
+      {
+        year: 2023,
+        holidayList: [
+          { date: "2023-01-01", explain: "元旦" },
+          { date: "2023-01-02", explain: "元旦" },
+          { date: "2023-01-21", explain: "春节" },
+          { date: "2023-01-22", explain: "春节" },
+          { date: "2023-01-23", explain: "春节" },
+          { date: "2023-01-24", explain: "春节" },
+          { date: "2023-01-25", explain: "春节" },
+          { date: "2023-01-26", explain: "春节" },
+          { date: "2023-01-27", explain: "春节" },
+          { date: "2023-04-05", explain: "清明节" },
+          { date: "2023-09-29", explain: "中秋节" },
+          { date: "2023-04-29", explain: "劳动节" },
+          { date: "2023-04-30", explain: "劳动节" },
+          { date: "2023-05-01", explain: "劳动节" },
+          { date: "2023-05-02", explain: "劳动节" },
+          { date: "2023-05-03", explain: "劳动节" },
+          { date: "2023-06-22", explain: "端午节" },
+          { date: "2023-06-23", explain: "端午节" },
+          { date: "2023-06-24", explain: "端午节" },
+          { date: "2023-09-30", explain: "国庆节" },
+          { date: "2023-10-01", explain: "国庆节" },
+          { date: "2023-10-01", explain: "国庆节" },
+          { date: "2023-10-02", explain: "国庆节" },
+          { date: "2023-10-03", explain: "国庆节" },
+          { date: "2023-10-04", explain: "国庆节" },
+          { date: "2023-10-05", explain: "国庆节" },
+          { date: "2023-10-06", explain: "国庆节" },
+        ],
+        repairList: [
+          { date: "2023-01-28", explain: "春节" },
+          { date: "2023-04-23", explain: "劳动节" },
+          { date: "2023-05-06", explain: "劳动节" },
+          { date: "2023-06-25", explain: "端午节" },
+          { date: "2023-10-07", explain: "国庆节" },
+          { date: "2023-10-08", explain: "国庆节" },
+        ]
+      }
+    ]
   },
 
   /**
@@ -76,6 +111,7 @@ Page({
    */
   isToday(year: number, month: number, date: number) {
     var now = new Date();
+    // console.log('isToday');
     return now.getFullYear() == year && now.getMonth() == (month - 1) && date == now.getDate();
   },
   /**
@@ -127,9 +163,6 @@ Page({
     }
   },
   makeWorkDate(date: Date) {
-    console.log('dsadddd*********************');
-
-    console.log(date);
     const year = date.getFullYear();
     const month = date.getMonth() + 1
     // 当月第一天
@@ -158,7 +191,8 @@ Page({
           type,
           week,
           explain: this.explainType(type),
-          bgColor: this.loadBgColor(date, week)
+          bgColor: this.loadBgColor(date, week),
+          isToday: this.isToday(year, month, date),
         });
       }
     }

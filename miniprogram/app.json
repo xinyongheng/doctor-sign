@@ -1,8 +1,6 @@
 {
   "pages": [
-    "pages/homepage/homepage",
-    "pages/index/index",
-    "pages/logs/logs"
+    "pages/homepage/homepage"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -11,5 +9,6 @@
     "navigationBarTextStyle": "black"
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
 }

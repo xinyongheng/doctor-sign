@@ -28,21 +28,25 @@
         <!-- grid列表 -->
         <view class="gridview">
             <view class="gridview-item" wx:for="{{week}}" wx:key="index">
-                <view class="center" style="color:{{(index>4)?'red':'black'}}">{{item}}</view>
+                <view class="center" style="color:{{(index>4)?'red':'black'}};border:1rpx solid black">
+                    {{item}}
+                </view>
             </view>
         </view>
         <view class="gridview">
             <view class="gridview-item" wx:for="{{workDates}}" wx:key="index" wx:for-item="workDate">
                 <!-- 日期子元素 -->
                 <view style="background-color:{{workDate.value?'#1ae':'transparent'}}">
-                    <view class="{{isToday(workDate.year,workDate.month,workDate.date)?'child-item':''}}">
+                    <view wx:if="{{workDate.date}}">
                         <view class="date-item">
-                            <view style="color:{{workDate.bgColor}}">{{workDate.value}}</view>
-                            <view style="color:white;font-size:18rpx;margin-top:5rpx">
-                                {{ workDate.explain }}
+                            <view wx:if="{{workDate.isToday}}" class="date-item-today"><view class="circle-point"></view></view>
+                            <view class="date-item-center" style="position: absolute;z-index: 2;">
+                                <view style="color:{{workDate.bgColor}}">{{workDate.value}}</view>
+                                <view style="color:white;font-size:18rpx;margin-top:5rpx">{{ workDate.explain }}</view>
                             </view>
                         </view>
                     </view>
+                    <view wx:else style="height:100rpx"></view>
                 </view>
             </view>
         </view>
