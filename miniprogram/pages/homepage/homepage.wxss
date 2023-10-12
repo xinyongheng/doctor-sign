@@ -21,11 +21,9 @@
 .center {
     justify-content: center;
     align-items: center;
-    /* width: 100%; */
+    width: 100%;
     display: flex;
-
 }
-
 .gridview-item {
     margin: 1% 1% 1% 1%;
     background: transparent;
@@ -82,10 +80,35 @@
     width: 100%;
     height: 100rpx;
 }
-.circle-point{
+
+.circle-point {
     background-color: red;
     height: 13rpx;
     width: 13rpx;
     border-radius: 100%;
     margin-top: 8rpx;
+}
+
+.date-item-type {
+    top: 3rpx;
+    right: 3rpx;
+    position: absolute;
+    font-size: 25rpx;
+    color: rgb(232, 54, 54);
+    border-radius: 100%;
+    width: 30rpx;
+    height: 30rpx;
+    text-align: center;
+}
+.date-item-type-bg {
+    top: 3rpx;
+    right: 3rpx;
+    position: absolute;
+    font-size: 20rpx;
+    color: rgb(232, 54, 54);
+    border-radius: 100%;
+    width: 30rpx;
+    height: 30rpx;
+    text-align: center;
+    background-color: white;
 }

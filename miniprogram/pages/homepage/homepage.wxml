@@ -20,10 +20,10 @@
         </picker>
     </view>
     <!-- 日期列表 -->
-    <view style="margin-top:10rpx">
+    <view style="margin-top:10rpx;" wx:for="{{workAllYearDate}}" wx:key="monthTag">
         <!-- 日期 -->
         <view class="center">
-            <text style="font-size:45rpx;font:bold">{{selectMonth}}</text>
+            <text style="font-size:45rpx;font:bold">{{item.monthTag}}</text>
         </view>
         <!-- grid列表 -->
         <view class="gridview">
@@ -34,15 +34,22 @@
             </view>
         </view>
         <view class="gridview">
-            <view class="gridview-item" wx:for="{{workDates}}" wx:key="index" wx:for-item="workDate">
+            <view class="gridview-item" wx:for="{{item.workDates}}" wx:key="index" wx:for-item="workDate">
                 <!-- 日期子元素 -->
                 <view style="background-color:{{workDate.value?'#1ae':'transparent'}}">
                     <view wx:if="{{workDate.date}}">
                         <view class="date-item">
-                            <view wx:if="{{workDate.isToday}}" class="date-item-today"><view class="circle-point"></view></view>
+                            <view wx:if="{{workDate.isToday}}" class="date-item-today">
+                                <view class="circle-point"></view>
+                            </view>
+                            <view wx:if="{{workDate.dateType}}" class="{{workDate.dateType=='班'?'date-item-type-bg':'date-item-type'}}">
+                                {{workDate.dateType}}
+                            </view>
                             <view class="date-item-center" style="position: absolute;z-index: 2;">
-                                <view style="color:{{workDate.bgColor}}">{{workDate.value}}</view>
-                                <view style="color:white;font-size:18rpx;margin-top:5rpx">{{ workDate.explain }}</view>
+                                <view style="color:{{workDate.bgColor}};font-size:36rpx;">{{workDate.value}}</view>
+                                <view style="color:white;font-size:20rpx;margin-top:3rpx">
+                                    {{ workDate.explain }}
+                                </view>
                             </view>
                         </view>
                     </view>
@@ -51,4 +58,5 @@
             </view>
         </view>
     </view>
+    <view style="width:100%;padding-top:100rpx;color:transparent">1111</view>
 </view>

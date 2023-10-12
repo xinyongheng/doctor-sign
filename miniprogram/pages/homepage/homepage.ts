@@ -30,9 +30,7 @@ Page({
     ],
     targetDate: new Date(Date.parse('2023-10-09')),
     week: ['一', '二', '三', '四', '五', '六', '日'],
-    workDates: [
-      { type: 0, year: 1, month: 1, date: 1, index: 0 },
-    ],
+    workAllYearDate: [{ monthTag: '2023-01', workDates: [{ type: 0, year: 1, month: 1, date: 1, index: 0 }] }],
     holiday: [
       {
         year: 2023,
@@ -86,7 +84,7 @@ Page({
     this.data.targetDate.setMinutes(0);
     this.data.targetDate.setSeconds(0);
     this.data.targetDate.setMilliseconds(0);
-    this.makeWorkDate(this.data.targetDate);
+    this.makeAllDate(this.data.targetDate);
   },
 
   setSelectDate(datestring: string) {
@@ -100,18 +98,17 @@ Page({
 
   bindDateChange: function (e: { detail: { value: string } }) {
     this.setSelectDate(e.detail.value)
-    this.makeWorkDate(this.data.targetDate);
+    this.makeAllDate(this.data.targetDate);
   },
   bindDoctorWorkChange(e: { detail: { value: number } }) {
     this.setData({ doctorWorkIndex: e.detail.value })
-    this.makeWorkDate(this.data.targetDate);
+    this.makeAllDate(this.data.targetDate);
   },
   /**
    * 是否为今天
    */
   isToday(year: number, month: number, date: number) {
     var now = new Date();
-    // console.log('isToday');
     return now.getFullYear() == year && now.getMonth() == (month - 1) && date == now.getDate();
   },
   /**
@@ -162,16 +159,26 @@ Page({
         return 0;
     }
   },
+  makeAllDate(date: Date) {
+    var year = date.getFullYear();
+    var startMonth = date.getMonth();
+    var arr = [];
+    for (let index = startMonth; index < 12; index++) {
+      var newDate = new Date(year, index, 1, 0, 0, 0, 0);
+      var workDates = this.makeWorkDate(newDate);
+      arr.push({ monthTag: year + "-" + this.no2string(index + 1), workDates });
+    }
+    this.setData({ workAllYearDate: arr });
+  },
   makeWorkDate(date: Date) {
     const year = date.getFullYear();
     const month = date.getMonth() + 1
     // 当月第一天
     const firstDate = new Date(year, date.getMonth(), 1);
     // 当月最后一天
-    const lastDate = new Date(year, date.getMonth(), 0);
+    const lastDate = new Date(year, month, 0);
     // 当月第一天 星期
     const firstWeek = firstDate.getDay();
-
     const emptyNum = firstWeek == 0 ? 6 : (firstWeek - 1);
     const allNum = emptyNum + lastDate.getDate();
     const maxRow = Math.ceil(allNum / 7);
@@ -181,7 +188,7 @@ Page({
     for (let row = 0; row < maxRow; row++) {
       for (let column = 0; column < this.data.week.length; column++) {
         const valueIndex = row * 7 + column + 1;
-        const date = (valueIndex > emptyNum && valueIndex <= allNum) ? valueIndex - emptyNum : 0
+        const date = (valueIndex > emptyNum && valueIndex <= allNum) ? valueIndex - emptyNum : 0;
         const type = this.loadWordType(year, month, date);
         const week = this.data.week[column];
         workDates.push({
@@ -193,15 +200,45 @@ Page({
           explain: this.explainType(type),
           bgColor: this.loadBgColor(date, week),
           isToday: this.isToday(year, month, date),
+          dateType: this.checkDateType(year, month, date)
         });
       }
     }
-    this.setData({ workDates });
+    return workDates;
   },
   loadBgColor(date: number, week: string) {
     if (date && (week == '六' || week == '日')) {
       return 'red';
     }
     return date ? 'white' : 'transport'
+  },
+  no2string(num: number): string {
+    if (num < 10) {
+      return '0' + num;
+    }
+    return num.toString();
+  },
+  checkDateType(year: number, month: number, date: number) {
+    if (date) {
+      var value = this.data.holiday.find(item => item.year == year);
+      if (value) {
+        var checkDateString = year + '-' + this.no2string(month) + '-' + this.no2string(date);
+        var holidayList = value.holidayList;
+        if (holidayList) {
+          var result = holidayList.find(item => checkDateString == item.date);
+          if (result) {
+            return '休';
+          }
+        }
+        var repairList = value.repairList;
+        if (repairList) {
+          var result = repairList.find(item => checkDateString == item.date);
+          if (result) {
+            return '班';
+          }
+        }
+      }
+    }
+    return undefined;
   }
 })
