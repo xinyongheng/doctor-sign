@@ -260,9 +260,9 @@ Page({
         const date = (valueIndex > emptyNum && valueIndex <= allNum) ? valueIndex - emptyNum : 0;
         const type = this.loadWordType(year, month, date);
         const week = this.data.week[column];
-        var lunar = date ? this.explainLocal(year,month,date) : "";
-        if(lunar=="春节"){
-          workDates[workDates.length-1].lunarDate="除夕";
+        var lunar = date ? this.explainLocal(year, month, date) : "";
+        if (lunar == "春节") {
+          workDates[workDates.length - 1].lunarDate = "除夕";
         }
         workDates.push({
           year, month, date,
@@ -275,7 +275,7 @@ Page({
           isToday: this.isToday(year, month, date),
           dateType: this.checkDateType(year, month, date),
           // lunarDate:this.getLunarDate(new Date(year, month, date, 0, 0, 0, 0)),
-          lunarDate: date ? this.explainLocal(year,month,date) : "",
+          lunarDate: date ? this.explainLocal(year, month, date) : "",
         });
       }
     }
@@ -321,7 +321,11 @@ Page({
     var s = date.toLocaleString("zh-Hans-u-ca-chinese");
     // var start = s.indexOf("年");
     console.log(s);
-
+    if (year == 2025 && month == 4 && day == 4) return "清明节";
+    if (month == 1 && day == 1) return "元旦";
+    if (month == 10 && day == 1) return "国庆节";
+    if (month == 5 && day == 1) return "劳动节";
+    if (month == 5 && day == 4) return "青年节";
     var reg = /年((.*月)(\d+))\s+/;
     var result = reg.exec(s);
     if (!result) return ""
@@ -329,12 +333,28 @@ Page({
     // if (cnDate == "正月15") return "元宵节";
     // console.log(result[3]);
     // console.log(result[2]);
-    return this.numToCN(parseInt(result[3]),result[2]);
+    return this.numToCN(parseInt(result[3]), result[2]);
   },
   numToCN: function (date: number, monthCn: string) {
     if (monthCn == "正月") {
       if (date == 1) return "春节";
       if (date == 15) return "元宵节";
+    }
+    if (monthCn == "二月") {
+      if (date == 2) return "中和节";
+    }
+    if (monthCn == "五月") {
+      if (date == 5) return "端午节";
+    }
+    if (monthCn == "七月") {
+      if (date == 7) return "七夕节";
+      if (date == 15) return "中元节";
+    }
+    if (monthCn == "八月") {
+      if (date == 15) return "中秋节";
+    }
+    if (monthCn == "九月") {
+      if (date == 9) return "重阳节";
     }
     if (date == 1) return monthCn;
     if (date == 20) return "廿十";
@@ -346,6 +366,7 @@ Page({
     return monthCn;
   },
   nTC: function (no: number) {
+    if (no == 1) return "一";
     if (no == 2) return "二";
     if (no == 3) return "三";
     if (no == 4) return "四";
