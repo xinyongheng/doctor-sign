@@ -11,6 +11,7 @@ interface WorkSetting {
   bgColor: string,
   isToday?: boolean,
   dateType?: string,
+  lunarDate: string,
 }
 Page({
 
@@ -18,9 +19,9 @@ Page({
    * 页面的初始数据
    */
   data: {
-    selectDate: '2023-10-09',
-    selectMonth: '2023-10',
-    doctorWorkIndex: 1,
+    selectDate: '2025-01-02',
+    selectMonth: '2025-01',
+    doctorWorkIndex: 0,
     gridHeight: 100,
     doctorWorkStyles: [
       '白班',
@@ -28,9 +29,12 @@ Page({
       '下夜班',
       '日休',
     ],
-    targetDate: new Date(Date.parse('2023-10-09')),
+    targetDate: new Date(Date.parse('2025-01-02')),
     week: ['一', '二', '三', '四', '五', '六', '日'],
     workAllYearDate: [{ monthTag: '2023-01', workDates: [{ type: 0, year: 1, month: 1, date: 1, index: 0 }] }],
+    chineseNumber: [
+      "正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"
+    ],
     holiday: [
       {
         year: 2023,
@@ -71,6 +75,46 @@ Page({
           { date: "2023-10-07", explain: "国庆节" },
           { date: "2023-10-08", explain: "国庆节" },
         ]
+      },
+      {
+        year: 2025,
+        holidayList: [
+          { date: "2025-01-01", explain: "元旦" },
+          { date: "2025-01-28", explain: "春节" },
+          { date: "2025-01-29", explain: "春节" },
+          { date: "2025-01-30", explain: "春节" },
+          { date: "2025-01-31", explain: "春节" },
+          { date: "2025-02-01", explain: "春节" },
+          { date: "2025-02-02", explain: "春节" },
+          { date: "2025-02-03", explain: "春节" },
+          { date: "2025-02-04", explain: "春节" },
+          { date: "2025-04-04", explain: "清明节" },
+          { date: "2025-04-05", explain: "清明节" },
+          { date: "2025-04-06", explain: "清明节" },
+          { date: "2025-05-01", explain: "劳动节" },
+          { date: "2025-05-02", explain: "劳动节" },
+          { date: "2025-05-03", explain: "劳动节" },
+          { date: "2025-05-04", explain: "劳动节" },
+          { date: "2025-05-05", explain: "劳动节" },
+          { date: "2025-05-31", explain: "劳动节" },
+          { date: "2025-06-01", explain: "端午节" },
+          { date: "2025-06-02", explain: "端午节" },
+          { date: "2025-10-01", explain: "国庆节" },
+          { date: "2025-10-02", explain: "国庆节" },
+          { date: "2025-10-03", explain: "国庆节" },
+          { date: "2025-10-04", explain: "国庆节" },
+          { date: "2025-10-05", explain: "国庆节" },
+          { date: "2025-10-06", explain: "国庆节" },
+          { date: "2025-10-07", explain: "国庆节" },
+          { date: "2025-10-08", explain: "国庆节" },
+        ],
+        repairList: [
+          { date: "2025-01-26", explain: "春节" },
+          { date: "2025-02-08", explain: "春节" },
+          { date: "2025-04-27", explain: "劳动节" },
+          { date: "2025-09-28", explain: "国庆节" },
+          { date: "2025-10-11", explain: "国庆节" },
+        ]
       }
     ]
   },
@@ -79,7 +123,25 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad() {
-    this.setData({ targetDate: new Date(this.data.selectDate) })
+    let that = this;
+    console.log(this.explainLocal(2025, 2, 12));
+    wx.getSystemInfo({
+      key: "lastDate",
+      success(res: any) {
+        if (res && res.data) {
+          that.data.doctorWorkIndex = res.data.doctorWorkIndex;
+          that.data.selectDate = res.data.selectDate;
+        }
+        that.initData(that.data.selectDate);
+      },
+      fail() {
+        that.initData(that.data.selectDate);
+      }
+    })
+  },
+
+  initData: function (selectDate: string) {
+    this.setData({ targetDate: new Date(selectDate) });
     this.data.targetDate.setHours(0);
     this.data.targetDate.setMinutes(0);
     this.data.targetDate.setSeconds(0);
@@ -95,13 +157,20 @@ Page({
     dateObj.setMilliseconds(0);
     this.setData({ selectDate: datestring, targetDate: dateObj, selectMonth: datestring.substring(0, 7) });
   },
-
+  saveSelectData: function (selectDate: string, index: number) {
+    wx.setStorage({
+      key: "lastDate",
+      data: { selectDate, doctorWorkIndex: index },
+    });
+  },
   bindDateChange: function (e: { detail: { value: string } }) {
-    this.setSelectDate(e.detail.value)
+    this.setSelectDate(e.detail.value);
+    this.saveSelectData(e.detail.value, this.data.doctorWorkIndex);
     this.makeAllDate(this.data.targetDate);
   },
   bindDoctorWorkChange(e: { detail: { value: number } }) {
     this.setData({ doctorWorkIndex: e.detail.value })
+    this.saveSelectData(this.data.selectDate, e.detail.value);
     this.makeAllDate(this.data.targetDate);
   },
   /**
@@ -191,6 +260,10 @@ Page({
         const date = (valueIndex > emptyNum && valueIndex <= allNum) ? valueIndex - emptyNum : 0;
         const type = this.loadWordType(year, month, date);
         const week = this.data.week[column];
+        var lunar = date ? this.explainLocal(year,month,date) : "";
+        if(lunar=="春节"){
+          workDates[workDates.length-1].lunarDate="除夕";
+        }
         workDates.push({
           year, month, date,
           value: date ? date : '',
@@ -200,7 +273,9 @@ Page({
           explain: this.explainType(type),
           bgColor: this.loadBgColor(date, week),
           isToday: this.isToday(year, month, date),
-          dateType: this.checkDateType(year, month, date)
+          dateType: this.checkDateType(year, month, date),
+          // lunarDate:this.getLunarDate(new Date(year, month, date, 0, 0, 0, 0)),
+          lunarDate: date ? this.explainLocal(year,month,date) : "",
         });
       }
     }
@@ -240,5 +315,46 @@ Page({
       }
     }
     return undefined;
+  },
+  explainLocal: function (year: number, month: number, day: number) {
+    var date = new Date(year, month - 1, day, 10);
+    var s = date.toLocaleString("zh-Hans-u-ca-chinese");
+    // var start = s.indexOf("年");
+    console.log(s);
+
+    var reg = /年((.*月)(\d+))\s+/;
+    var result = reg.exec(s);
+    if (!result) return ""
+    // var cnDate = result[1];
+    // if (cnDate == "正月15") return "元宵节";
+    // console.log(result[3]);
+    // console.log(result[2]);
+    return this.numToCN(parseInt(result[3]),result[2]);
+  },
+  numToCN: function (date: number, monthCn: string) {
+    if (monthCn == "正月") {
+      if (date == 1) return "春节";
+      if (date == 15) return "元宵节";
+    }
+    if (date == 1) return monthCn;
+    if (date == 20) return "廿十";
+    if (date <= 10) return "初" + this.nTC(date);
+    if (date < 20) return "十" + this.nTC(date % 10);
+    if (date < 30) return "廿" + this.nTC(date % 10);
+    if (date == 30) return "三十";
+    if (date > 30) return "三十" + this.nTC(date % 10);
+    return monthCn;
+  },
+  nTC: function (no: number) {
+    if (no == 2) return "二";
+    if (no == 3) return "三";
+    if (no == 4) return "四";
+    if (no == 5) return "五";
+    if (no == 6) return "六";
+    if (no == 7) return "七";
+    if (no == 8) return "八";
+    if (no == 9) return "九";
+    if (no == 10) return "十";
+    return "";
   }
 })

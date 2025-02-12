@@ -37,7 +37,7 @@
 }
 
 .date-item {
-    height: 100rpx;
+    height: 130rpx;
     justify-content: center;
     display: flex;
     flex-direction: column;
