@@ -4,9 +4,11 @@
     font-size: 20rpx;
     margin-left: 5rpx;
 }
-
+.header{
+  height: auto;
+}
 .font30 {
-    font-size: 35rpx;
+    font-size: 30rpx;
 }
 
 .color3 {
@@ -15,7 +17,13 @@
 }
 
 .color6 {
-    color: #666;
+    color: rgb(54, 54, 54);
+    background-color: rgb(255, 255, 255);
+    border: solid grey 1rpx;
+    min-width: 180rpx;
+    display: inline-block;
+    padding: 5rpx;
+    border-radius: 10rpx;
 }
 
 .center {

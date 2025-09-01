@@ -1,4 +1,5 @@
 // pages/homepage/homepage.ts
+var util = require("../../utils/index");
 interface WorkSetting {
   type: number,
   date: number,
@@ -124,20 +125,27 @@ Page({
    */
   onLoad() {
     let that = this;
-    console.log(this.explainLocal(2025, 2, 12));
-    wx.getSystemInfo({
+    // console.log(this.explainLocal(2025, 2, 12));
+    var date = new Date();
+
+    console.log('toLocaleString', date.toLocaleString("zh-Hans-u-ca-chinese"));
+    console.log("getLunarDate=", util.getLunarDate(2025, 9 - 1, 1));
+
+    wx.getStorage({
       key: "lastDate",
       success(res: any) {
         if (res && res.data) {
           that.data.doctorWorkIndex = res.data.doctorWorkIndex;
-          that.data.selectDate = res.data.selectDate;
+          // that.data.selectDate = res.data.selectDate;
+          that.setData({ selectDate: res.data.selectDate });
         }
         that.initData(that.data.selectDate);
       },
       fail() {
         that.initData(that.data.selectDate);
       }
-    })
+    });
+
   },
 
   initData: function (selectDate: string) {
@@ -228,7 +236,8 @@ Page({
         return 0;
     }
   },
-  makeAllDate(date: Date) {
+  makeAllDate(_date1: Date) {
+    var date = new Date("2025-01-02");
     var year = date.getFullYear();
     var startMonth = date.getMonth();
     var arr = [];
@@ -237,7 +246,15 @@ Page({
       var workDates = this.makeWorkDate(newDate);
       arr.push({ monthTag: year + "-" + this.no2string(index + 1), workDates });
     }
-    this.setData({ workAllYearDate: arr });
+    this.setData({ workAllYearDate: arr }, function () {
+      wx.createSelectorQuery().select('.date-item-today').boundingClientRect(function (res) {
+        var top = res.top - 100; // #the-id 节点的上边界坐标（相对于显示区域）
+        wx.pageScrollTo({
+          scrollTop: top,
+          duration: 300
+        });
+      }).exec();
+    });
   },
   makeWorkDate(date: Date) {
     const year = date.getFullYear();
@@ -320,7 +337,7 @@ Page({
     var date = new Date(year, month - 1, day, 10);
     var s = date.toLocaleString("zh-Hans-u-ca-chinese");
     // var start = s.indexOf("年");
-    console.log(s);
+    // console.log(s);
     if (year == 2025 && month == 4 && day == 4) return "清明节";
     if (month == 1 && day == 1) return "元旦";
     if (month == 10 && day == 1) return "国庆节";
@@ -328,7 +345,10 @@ Page({
     if (month == 5 && day == 4) return "青年节";
     var reg = /年((.*月)(\d+))\s+/;
     var result = reg.exec(s);
-    if (!result) return ""
+    if (!result) {
+      var info = util.getLunarDate(year, month - 1, day);
+      return this.numToCN(info.day, info.month);
+    }
     // var cnDate = result[1];
     // if (cnDate == "正月15") return "元宵节";
     // console.log(result[3]);
@@ -377,5 +397,9 @@ Page({
     if (no == 9) return "九";
     if (no == 10) return "十";
     return "";
-  }
+  },
+  onShow: function () {
+
+  },
+
 })
