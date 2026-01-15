@@ -30,7 +30,9 @@ Page({
       '下夜班',
       '日休',
     ],
-    targetDate: new Date(Date.parse('2025-01-02')),
+    // 1 产科； 2 妇科
+    yearWorkStyles: "产科",
+    targetDate: new Date(),
     week: ['一', '二', '三', '四', '五', '六', '日'],
     workAllYearDate: [{ monthTag: '2023-01', workDates: [{ type: 0, year: 1, month: 1, date: 1, index: 0 }] }],
     chineseNumber: [
@@ -115,7 +117,8 @@ Page({
           { date: "2025-04-27", explain: "劳动节" },
           { date: "2025-09-28", explain: "国庆节" },
           { date: "2025-10-11", explain: "国庆节" },
-        ]
+        ],
+        other: []
       }
     ]
   },
@@ -125,12 +128,24 @@ Page({
    */
   onLoad() {
     let that = this;
-    // console.log(this.explainLocal(2025, 2, 12));
-    var date = new Date();
-
-    console.log('toLocaleString', date.toLocaleString("zh-Hans-u-ca-chinese"));
-    console.log("getLunarDate=", util.getLunarDate(2025, 9 - 1, 1));
-
+    wx.request(
+      {
+        url: "https://gitee.com/xinyongheng/app-address/raw/master/holiday.json",
+        method: "GET",
+        header: {
+          'content-type': 'application/json',
+        },
+        success: (res) => {
+          var list: any = res.data;
+          that.setData({ holiday: list });
+          that.onLoadInit(that);
+        },
+        fail: (_err) => {
+          that.onLoadInit(that);
+        }
+      });
+  },
+  onLoadInit: function (that: any) {
     wx.getStorage({
       key: "lastDate",
       success(res: any) {
@@ -145,11 +160,20 @@ Page({
         that.initData(that.data.selectDate);
       }
     });
-
   },
-
   initData: function (selectDate: string) {
-    this.setData({ targetDate: new Date(selectDate) });
+    this.setData({ targetDate: new Date(selectDate), yearWorkStyles: this.loadYearStyle(selectDate) });
+    if (this.data.yearWorkStyles == "妇科") {
+      this.setData({
+        doctorWorkStyles: [
+          '白班',
+          '夜班',
+          '下夜班',
+          '日休1',
+          '日休2',
+        ]
+      });
+    }
     this.data.targetDate.setHours(0);
     this.data.targetDate.setMinutes(0);
     this.data.targetDate.setSeconds(0);
@@ -175,11 +199,17 @@ Page({
     this.setSelectDate(e.detail.value);
     this.saveSelectData(e.detail.value, this.data.doctorWorkIndex);
     this.makeAllDate(this.data.targetDate);
+    this.setData({ yearWorkStyles: this.loadYearStyle(e.detail.value) });
   },
   bindDoctorWorkChange(e: { detail: { value: number } }) {
     this.setData({ doctorWorkIndex: e.detail.value })
     this.saveSelectData(this.data.selectDate, e.detail.value);
     this.makeAllDate(this.data.targetDate);
+  },
+  loadYearStyle(datestring: string) {
+    var dateObj = new Date(datestring);
+    var num = (dateObj.getFullYear() - 2025) % 2;
+    return num == 0 ? "产科" : "妇科";
   },
   /**
    * 是否为今天
@@ -195,18 +225,35 @@ Page({
     const dateObj = new Date(year, month - 1, date);
     const _time = dateObj.getTime() - this.data.targetDate.getTime();
     var _day = _time / 3600 / 24000;
-    var _a = _day % 4
-    if (_a < 0) _a += 4;
+    var targetNumber = this.data.yearWorkStyles == "妇科" ? 5 : 4;
+    var _a = _day % targetNumber
+    if (_a < 0) _a += targetNumber;
     // console.log(_a + ', ' + _day);
     var word_setting = this.explainToNum(this.data.doctorWorkStyles[this.data.doctorWorkIndex]);
     var _b = word_setting + _a
     // console.log(_a + ', ' + _b);
-    return _b > 4 ? _b - 4 : _b;
+    return _b > targetNumber ? _b - targetNumber : _b;
   },
   /**
    * 类型装欢
    */
   explainType(type: number) {
+    if (this.data.yearWorkStyles == "妇科") {
+      switch (type) {
+        case 1:
+          return '白班';
+        case 2:
+          return '夜班';
+        case 3:
+          return '下夜班';
+        case 4:
+          return '日休1';
+        case 5:
+          return '日休2';
+        default:
+          return '错误';
+      }
+    }
     switch (type) {
       case 1:
         return '白班';
@@ -222,6 +269,23 @@ Page({
     }
   },
   explainToNum(style: string) {
+    if (this.data.yearWorkStyles == "妇科") {
+      switch (style) {
+        case '白班':
+          return 1;
+        case '夜班':
+          return 2;
+        case '下夜班':
+          return 3;
+        case '日休1':
+          return 4;
+        case '日休2':
+          return 5;
+        default:
+          // console.log('错误: ' + type);
+          return 0;
+      }
+    }
     switch (style) {
       case '白班':
         return 1;
@@ -237,7 +301,7 @@ Page({
     }
   },
   makeAllDate(_date1: Date) {
-    var date = new Date("2025-01-02");
+    var date = new Date();
     var year = date.getFullYear();
     var startMonth = date.getMonth();
     var arr = [];
@@ -248,6 +312,7 @@ Page({
     }
     this.setData({ workAllYearDate: arr }, function () {
       wx.createSelectorQuery().select('.date-item-today').boundingClientRect(function (res) {
+        if (!res) return;
         var top = res.top - 100; // #the-id 节点的上边界坐标（相对于显示区域）
         wx.pageScrollTo({
           scrollTop: top,
@@ -343,6 +408,14 @@ Page({
     if (month == 10 && day == 1) return "国庆节";
     if (month == 5 && day == 1) return "劳动节";
     if (month == 5 && day == 4) return "青年节";
+    var holidayData: any = this.data.holiday.find(e => e.year == year);
+    var other = holidayData = holidayData.other;
+    if (other) {
+      var find = other.find((e: any) => this.isSameDate(date, e.date));
+      if (find && find.explain) {
+        return find.explain;
+      }
+    }
     var reg = /年((.*月)(\d+))\s+/;
     var result = reg.exec(s);
     if (!result) {
@@ -354,6 +427,17 @@ Page({
     // console.log(result[3]);
     // console.log(result[2]);
     return this.numToCN(parseInt(result[3]), result[2]);
+  },
+  /**
+   * 是否为同一天
+   * @param date 
+   * @param dateS 
+   */
+  isSameDate: function (date: Date, dateS: string) {
+    var date1 = new Date(dateS);
+    return date.getFullYear() == date1.getFullYear() &&
+      date.getMonth() == date1.getMonth() &&
+      date.getDate() == date1.getDate();
   },
   numToCN: function (date: number, monthCn: string) {
     if (monthCn == "正月") {

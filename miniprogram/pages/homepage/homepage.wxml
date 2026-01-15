@@ -15,7 +15,8 @@
       <view class="font30">
         <text class="color3">* 排班类型：</text>
         <text class="color6">{{doctorWorkStyles[doctorWorkIndex]}}</text>
-        <text class="timeIcon">▼</text>
+        <text class="timeIcon"> -- </text>
+        <text class="color3">{{yearWorkStyles}}</text>
       </view>
     </picker>
   </view>
